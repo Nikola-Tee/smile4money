@@ -67,7 +67,7 @@ fn test_create_match() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "abc123"),
         &Platform::Lichess,
     );
@@ -107,7 +107,7 @@ fn test_deposit_invalid_match_id_beyond_count() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "match0"),
         &Platform::Lichess,
     );
@@ -135,7 +135,7 @@ fn test_cancel_match_invalid_match_id_beyond_count() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "cancel_beyond"),
         &Platform::Lichess,
     );
@@ -168,7 +168,7 @@ fn test_submit_result_invalid_match_id_beyond_count() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "submit_beyond"),
         &Platform::Lichess,
     );
@@ -201,7 +201,7 @@ fn test_get_match_invalid_match_id_beyond_count() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "get_beyond"),
         &Platform::Lichess,
     );
@@ -229,7 +229,7 @@ fn test_get_platform_invalid_match_id_beyond_count() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "get_platform_beyond"),
         &Platform::Lichess,
     );
@@ -248,7 +248,7 @@ fn test_get_platform_lichess() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "lichess-platform"),
         &Platform::Lichess,
     );
@@ -265,7 +265,7 @@ fn test_get_platform_chessdotcom() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "chessdotcom-platform"),
         &Platform::ChessDotCom,
     );
@@ -283,7 +283,7 @@ fn test_deposit_and_activate() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "abc123"),
         &Platform::Lichess,
     );
@@ -308,7 +308,7 @@ fn test_payout_winner() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "game1"),
         &Platform::Lichess,
     );
@@ -337,7 +337,7 @@ fn test_payout_winner_player2() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "game_player2"),
         &Platform::Lichess,
     );
@@ -366,7 +366,7 @@ fn test_draw_refund() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "game2"),
         &Platform::ChessDotCom,
     );
@@ -393,7 +393,7 @@ fn test_cancel_refunds_depositor() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "game3"),
         &Platform::Lichess,
     );
@@ -416,7 +416,7 @@ fn test_player2_can_cancel_pending_match() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "p2cancel"),
         &Platform::Lichess,
     );
@@ -452,7 +452,7 @@ fn test_cancel_with_both_deposits_requires_both_auth() {
     let safe_address = Address::generate(&env);
     client.initialize(&oracle, &admin, &token_addr, &safe_address, &None, &None);
 
-    // Fund reserve buffer (matches setup() helper — see ensure_reserve_for_payout)
+    // Fund reserve buffer (matches setup() helper â€” see ensure_reserve_for_payout)
     asset_client.mint(&contract_id, &crate::ESCROW_RESERVE_BUFFER_STROOPS);
 
     // Approve the escrow contract for both players
@@ -465,14 +465,14 @@ fn test_cancel_with_both_deposits_requires_both_auth() {
         &player1,
         &player2,
         &100,
-        &token_addr,
+        &Some(token_addr),
         &String::from_str(&env, "both_deposits"),
         &Platform::Lichess,
     );
     client.deposit(&id, &player1);
     client.deposit(&id, &player2);
 
-    // Now set auth to only player1 — should panic because player2's auth is also required
+    // Now set auth to only player1 â€” should panic because player2's auth is also required
     env.mock_auths(&[MockAuth {
         address: &player1,
         invoke: &MockAuthInvoke {
@@ -519,7 +519,7 @@ fn test_cancel_active_match_unilateral_fails() {
         &player1,
         &player2,
         &100,
-        &token_addr,
+        &Some(token_addr),
         &String::from_str(&env, "active_cancel"),
         &Platform::Lichess,
     );
@@ -557,7 +557,7 @@ fn test_cancel_active_match_mutual_succeeds() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "active_mutual_cancel"),
         &Platform::Lichess,
     );
@@ -584,7 +584,7 @@ fn test_cancel_completed_match_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "completed_cancel"),
         &Platform::Lichess,
     );
@@ -612,7 +612,7 @@ fn test_deposit_into_completed_match_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "completed_deposit"),
         &Platform::Lichess,
     );
@@ -640,7 +640,7 @@ fn test_deposit_after_cancel_returns_match_cancelled() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "cancelled_deposit"),
         &Platform::Lichess,
     );
@@ -661,7 +661,7 @@ fn test_non_oracle_cannot_submit_result() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "unauth_oracle"),
         &Platform::Lichess,
     );
@@ -694,7 +694,7 @@ fn test_submit_result_random_caller_is_unauthorized() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "random_caller"),
         &Platform::Lichess,
     );
@@ -704,7 +704,7 @@ fn test_submit_result_random_caller_is_unauthorized() {
     let random = Address::generate(&env);
     let game_id = String::from_str(&env, "random_caller");
 
-    // Provide auth for the random address — the contract must still reject it.
+    // Provide auth for the random address â€” the contract must still reject it.
     env.mock_auths(&[MockAuth {
         address: &random,
         invoke: &MockAuthInvoke {
@@ -731,7 +731,7 @@ fn test_submit_result_on_pending_match_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "pending_submit"),
         &Platform::Lichess,
     );
@@ -757,7 +757,7 @@ fn test_submit_result_on_completed_match_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "double_submit"),
         &Platform::Lichess,
     );
@@ -787,8 +787,8 @@ fn test_submit_result_on_completed_match_fails() {
 /// `InvalidState`, preventing double-payout.
 ///
 /// **Scenario**:
-/// 1. Match created and both players deposit → state = Active
-/// 2. First submit_result call succeeds → state transitions to PendingResult
+/// 1. Match created and both players deposit â†’ state = Active
+/// 2. First submit_result call succeeds â†’ state transitions to PendingResult
 /// 3. Second submit_result call (same match_id, potentially different winner)
 ///    is rejected with InvalidState
 /// 4. Balances remain unchanged after the rejection
@@ -796,7 +796,7 @@ fn test_submit_result_on_completed_match_fails() {
 /// **Why this matters**:
 /// - The escrow contract relies on the state machine to prevent duplicate submissions.
 /// - This test documents that deduplication is implicit in the state transition logic:
-///   Active → PendingResult (only valid state for submit_result).
+///   Active â†’ PendingResult (only valid state for submit_result).
 /// - Mirrors the oracle contract's explicit AlreadySubmitted deduplication.
 #[test]
 fn test_submit_result_queue_deduplication_prevents_duplicate_match_id() {
@@ -808,12 +808,12 @@ fn test_submit_result_queue_deduplication_prevents_duplicate_match_id() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "queue_dedup_test"),
         &Platform::Lichess,
     );
 
-    // Both players deposit → match is now Active
+    // Both players deposit â†’ match is now Active
     client.deposit(&match_id, &player1);
     client.deposit(&match_id, &player2);
     assert_eq!(client.get_match(&match_id).state, MatchState::Active);
@@ -823,7 +823,7 @@ fn test_submit_result_queue_deduplication_prevents_duplicate_match_id() {
     let p2_before = token_client.balance(&player2);
     let escrow_before = client.get_escrow_balance(&match_id);
 
-    // ── First submission (simulates first item dequeued from queue) ──────────
+    // â”€â”€ First submission (simulates first item dequeued from queue) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let game_id = String::from_str(&env, "queue_dedup_test");
     client.submit_result(&match_id, &game_id, &Winner::Player1, &oracle);
 
@@ -834,7 +834,7 @@ fn test_submit_result_queue_deduplication_prevents_duplicate_match_id() {
     let p1_after_first = token_client.balance(&player1);
     let p2_after_first = token_client.balance(&player2);
 
-    // ── Second submission (simulates duplicate item from queue) ───────────────
+    // â”€â”€ Second submission (simulates duplicate item from queue) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Oracle tries to submit a result for the same match_id again
     // (this could be a different winner due to queue bug or race condition)
     let result = client.try_submit_result(&match_id, &game_id, &Winner::Player2, &oracle);
@@ -872,10 +872,10 @@ fn test_submit_result_queue_deduplication_prevents_duplicate_match_id() {
         "escrow balance should decrease after first successful payout"
     );
 
-    // ── Summary of deduplication protection ─────────────────────────────────
+    // â”€â”€ Summary of deduplication protection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // The escrow contract prevents queue-based duplicate submissions via its
     // state machine:
-    //   - Active state only allows submit_result → PendingResult transition
+    //   - Active state only allows submit_result â†’ PendingResult transition
     //   - Once PendingResult, any further submit_result call fails with InvalidState
     //   - This provides implicit deduplication without a separate tracking index
     //
@@ -891,7 +891,7 @@ fn test_submit_result_wrong_game_id_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "real_game"),
         &Platform::Lichess,
     );
@@ -937,7 +937,7 @@ fn test_create_match_zero_stake_fails() {
             &player1,
             &player2,
             &0,
-            &token,
+            &Some(token),
             &String::from_str(&env, "zero_stake"),
             &Platform::Lichess,
         ),
@@ -954,7 +954,7 @@ fn test_create_match_self_match_fails() {
             &player1,
             &player1,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "self_match"),
             &Platform::Lichess,
         ),
@@ -978,7 +978,7 @@ fn test_create_match_player1_zero_address_fails() {
             &zero_address,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "zero_p1"),
             &Platform::Lichess,
         ),
@@ -1002,7 +1002,7 @@ fn test_create_match_player2_zero_address_fails() {
             &player1,
             &zero_address,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "zero_p2"),
             &Platform::Lichess,
         ),
@@ -1021,7 +1021,7 @@ fn test_duplicate_game_id_rejected() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "dup_game"),
         &Platform::Lichess,
     );
@@ -1031,7 +1031,7 @@ fn test_duplicate_game_id_rejected() {
             &player3,
             &player4,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "dup_game"),
             &Platform::Lichess,
         ),
@@ -1050,7 +1050,7 @@ fn test_duplicate_game_id_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "dup_game_id"),
         &Platform::Lichess,
     );
@@ -1059,7 +1059,7 @@ fn test_duplicate_game_id_fails() {
             &player3,
             &player4,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "dup_game_id"),
             &Platform::Lichess,
         ),
@@ -1076,7 +1076,7 @@ fn test_create_match_empty_game_id_fails() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, ""),
             &Platform::Lichess,
         ),
@@ -1084,19 +1084,19 @@ fn test_create_match_empty_game_id_fails() {
     );
 }
 
-// ── #1029: game_id character-set validation ──────────────────────────────────
+// â”€â”€ #1029: game_id character-set validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 #[test]
 fn test_create_match_valid_game_id_alphanum() {
     let (env, contract_id, _oracle, player1, player2, token, _admin, _safe_address) = setup();
     let client = EscrowContractClient::new(&env, &contract_id);
-    // Pure alphanumeric — should succeed
+    // Pure alphanumeric â€” should succeed
     assert!(client
         .try_create_match(
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "abc123XYZ"),
             &Platform::Lichess,
         )
@@ -1113,7 +1113,7 @@ fn test_create_match_valid_game_id_with_hyphen_and_underscore() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "game-001_ranked"),
             &Platform::Lichess,
         )
@@ -1124,14 +1124,14 @@ fn test_create_match_valid_game_id_with_hyphen_and_underscore() {
 fn test_create_match_game_id_with_null_byte_rejected() {
     let (env, contract_id, _oracle, player1, player2, token, _admin, _safe_address) = setup();
     let client = EscrowContractClient::new(&env, &contract_id);
-    // Null byte — must be rejected
+    // Null byte â€” must be rejected
     let game_id = String::from_bytes(&env, &[b'a', b'b', 0x00, b'c']);
     assert_eq!(
         client.try_create_match(
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         ),
@@ -1143,14 +1143,14 @@ fn test_create_match_game_id_with_null_byte_rejected() {
 fn test_create_match_game_id_with_control_char_rejected() {
     let (env, contract_id, _oracle, player1, player2, token, _admin, _safe_address) = setup();
     let client = EscrowContractClient::new(&env, &contract_id);
-    // Tab control character (0x09) — must be rejected
+    // Tab control character (0x09) â€” must be rejected
     let game_id = String::from_bytes(&env, &[b'g', b'a', b'm', b'e', 0x09]);
     assert_eq!(
         client.try_create_match(
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         ),
@@ -1162,13 +1162,13 @@ fn test_create_match_game_id_with_control_char_rejected() {
 fn test_create_match_game_id_with_space_rejected() {
     let (env, contract_id, _oracle, player1, player2, token, _admin, _safe_address) = setup();
     let client = EscrowContractClient::new(&env, &contract_id);
-    // Space (0x20) — must be rejected
+    // Space (0x20) â€” must be rejected
     assert_eq!(
         client.try_create_match(
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "game id"),
             &Platform::Lichess,
         ),
@@ -1180,14 +1180,14 @@ fn test_create_match_game_id_with_space_rejected() {
 fn test_create_match_game_id_with_non_ascii_rejected() {
     let (env, contract_id, _oracle, player1, player2, token, _admin, _safe_address) = setup();
     let client = EscrowContractClient::new(&env, &contract_id);
-    // High byte 0x80 — must be rejected
+    // High byte 0x80 â€” must be rejected
     let game_id = String::from_bytes(&env, &[b'g', b'a', b'm', b'e', 0x80]);
     assert_eq!(
         client.try_create_match(
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         ),
@@ -1205,7 +1205,7 @@ fn test_create_match_game_id_with_dot_rejected() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "game.id"),
             &Platform::Lichess,
         ),
@@ -1213,7 +1213,8 @@ fn test_create_match_game_id_with_dot_rejected() {
     );
 }
 
-
+#[test]
+fn test_create_match_wrong_token_rejected() {
     let (env, contract_id, _oracle, player1, player2, _token, admin, _safe_address) = setup();
     let client = EscrowContractClient::new(&env, &contract_id);
 
@@ -1227,11 +1228,11 @@ fn test_create_match_game_id_with_dot_rejected() {
             &player1,
             &player2,
             &100,
-            &wrong_token,
+            &Some(wrong_token),
             &String::from_str(&env, "wrong_token"),
             &Platform::Lichess,
         ),
-        Err(Ok(Error::InvalidToken))
+        Err(Ok(Error::TokenNotAllowlisted))
     );
 }
 
@@ -1244,7 +1245,7 @@ fn test_unauthorized_player_cannot_cancel() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "unauth_cancel"),
         &Platform::Lichess,
     );
@@ -1261,7 +1262,7 @@ fn test_deposit_by_non_player_returns_unauthorized() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "unauth_deposit"),
         &Platform::Lichess,
     );
@@ -1282,7 +1283,7 @@ fn test_is_funded_false_after_one_deposit() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "one_deposit"),
         &Platform::Lichess,
     );
@@ -1302,7 +1303,7 @@ fn test_escrow_balance_after_single_deposit() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "single_deposit"),
         &Platform::Lichess,
     );
@@ -1319,7 +1320,7 @@ fn test_escrow_balance_stages() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "balance_stages"),
         &Platform::Lichess,
     );
@@ -1340,7 +1341,7 @@ fn test_draw_payout_exact_amounts() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "draw_exact"),
         &Platform::Lichess,
     );
@@ -1368,7 +1369,7 @@ fn test_update_oracle() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "oracle_rotate"),
         &Platform::Lichess,
     );
@@ -1469,7 +1470,7 @@ fn test_pause_blocks_all_state_changing_operations() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "pause_test"),
         &Platform::Lichess,
     );
@@ -1482,7 +1483,7 @@ fn test_pause_blocks_all_state_changing_operations() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "paused_create"),
             &Platform::Lichess,
         ),
@@ -1505,7 +1506,7 @@ fn test_pause_blocks_all_state_changing_operations() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "pause_test_active"),
         &Platform::Lichess,
     );
@@ -1705,7 +1706,7 @@ fn test_game_id_ttl_set_on_creation() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &game_id,
         &Platform::Lichess,
     );
@@ -1727,7 +1728,7 @@ fn test_ttl_extended_on_state_changes() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "ttl_game"),
         &Platform::Lichess,
     );
@@ -1762,7 +1763,7 @@ fn test_create_match_emits_event() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &game_id,
         &Platform::Lichess,
     );
@@ -1795,7 +1796,7 @@ fn test_deposit_emits_event() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "deposit_ev"),
         &Platform::Lichess,
     );
@@ -1831,7 +1832,7 @@ fn test_deposit_event_player_label() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "label_ev"),
         &Platform::Lichess,
     );
@@ -1876,7 +1877,7 @@ fn test_half_funded_event_on_first_deposit() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "half_funded_ev"),
         &Platform::Lichess,
     );
@@ -1926,7 +1927,7 @@ fn test_submit_result_emits_event() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "result_ev"),
         &Platform::Lichess,
     );
@@ -1965,7 +1966,7 @@ fn test_cancel_match_emits_event() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "cancel_ev"),
         &Platform::Lichess,
     );
@@ -1999,7 +2000,7 @@ fn test_pause_prevents_match_creation() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "paused_match"),
             &Platform::Lichess,
         ),
@@ -2020,7 +2021,7 @@ fn test_unpause_enables_match_creation() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "unpaused_match"),
         &Platform::Lichess,
     );
@@ -2041,7 +2042,7 @@ fn test_update_oracle_rotates_address() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "oracle_test"),
         &Platform::Lichess,
     );
@@ -2133,7 +2134,7 @@ fn test_multiple_matches_independent() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "game_m0"),
         &Platform::Lichess,
     );
@@ -2141,7 +2142,7 @@ fn test_multiple_matches_independent() {
         &player3,
         &player4,
         &200,
-        &token,
+        &Some(token),
         &String::from_str(&env, "game_m1"),
         &Platform::Lichess,
     );
@@ -2149,7 +2150,7 @@ fn test_multiple_matches_independent() {
         &player1,
         &player3,
         &50,
-        &token,
+        &Some(token),
         &String::from_str(&env, "game_m2"),
         &Platform::ChessDotCom,
     );
@@ -2200,7 +2201,7 @@ fn test_pause_blocks_deposit() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "pause_deposit"),
         &Platform::Lichess,
     );
@@ -2216,7 +2217,7 @@ fn test_pause_blocks_deposit() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "pause_create"),
             &Platform::Lichess,
         ),
@@ -2250,7 +2251,7 @@ fn test_cancel_match_allowed_while_paused() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "pause_cancel"),
         &Platform::Lichess,
     );
@@ -2279,7 +2280,7 @@ fn test_submit_result_on_cancelled_match_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "cancelled_result"),
         &Platform::Lichess,
     );
@@ -2297,7 +2298,7 @@ fn test_submit_result_on_cancelled_match_fails() {
     );
 }
 
-// Issue #1124 — Explicit test: second deposit for the same player returns AlreadyFunded.
+// Issue #1124 â€” Explicit test: second deposit for the same player returns AlreadyFunded.
 //
 // The AlreadyFunded invariant is enforced independently for each player.
 // This test documents the expected behaviour for player2 so the idempotency
@@ -2311,7 +2312,7 @@ fn test_second_deposit_player2_returns_already_funded() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "already_funded_p2"),
         &Platform::Lichess,
     );
@@ -2336,7 +2337,7 @@ fn test_double_deposit_same_player_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "double_dep"),
         &Platform::Lichess,
     );
@@ -2357,7 +2358,7 @@ fn test_create_match_negative_stake_fails() {
             &player1,
             &player2,
             &-1,
-            &token,
+            &Some(token),
             &String::from_str(&env, "neg_stake"),
             &Platform::Lichess,
         ),
@@ -2376,7 +2377,7 @@ fn test_escrow_balance_zero_after_cancel() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "cancel_balance"),
         &Platform::Lichess,
     );
@@ -2399,7 +2400,7 @@ fn test_escrow_balance_full_pot_while_pending_result() {
         &player1,
         &player2,
         &stake,
-        &token,
+        &Some(token),
         &String::from_str(&env, "pending_result_balance"),
         &Platform::Lichess,
     );
@@ -2420,7 +2421,7 @@ fn test_escrow_balance_full_pot_while_pending_result() {
 }
 
 // Issue #180: Once both players have deposited the match transitions to Active.
-// Mutual cancel_match is now allowed for Active matches — both players must authorize.
+// Mutual cancel_match is now allowed for Active matches â€” both players must authorize.
 // Unilateral cancel (only one player's auth) must still be rejected.
 #[test]
 fn test_cancel_with_both_deposits_requires_auth() {
@@ -2432,12 +2433,12 @@ fn test_cancel_with_both_deposits_requires_auth() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "both_dep_cancel"),
         &Platform::Lichess,
     );
 
-    // Both players deposit → state becomes Active
+    // Both players deposit â†’ state becomes Active
     client.deposit(&id, &player1);
     client.deposit(&id, &player2);
     assert_eq!(client.get_match(&id).state, MatchState::Active);
@@ -2462,7 +2463,7 @@ fn test_submit_result_on_cancelled_match_no_deposit_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "cancelled_result2"),
         &Platform::Lichess,
     );
@@ -2497,7 +2498,7 @@ fn test_match_count_overflow_returns_error() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &String::from_str(&env, "overflow_game"),
             &Platform::Lichess,
         ),
@@ -2522,7 +2523,7 @@ fn test_player2_win_payout_full_pot() {
         &player1,
         &player2,
         &stake,
-        &token,
+        &Some(token),
         &String::from_str(&env, "p2_win_pot"),
         &Platform::Lichess,
     );
@@ -2559,7 +2560,7 @@ fn test_cancel_match_refunds_only_player1_when_only_player1_deposited() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "partial_deposit_cancel"),
         &Platform::Lichess,
     );
@@ -2570,7 +2571,7 @@ fn test_cancel_match_refunds_only_player1_when_only_player1_deposited() {
     assert_eq!(token_client.balance(&player2), 1000); // player2 untouched
     assert_eq!(client.get_escrow_balance(&id), 100);
 
-    // Cancel — player2 triggers the cancellation
+    // Cancel â€” player2 triggers the cancellation
     client.cancel_match(&id, &player2);
 
     // player1 must be fully refunded
@@ -2583,7 +2584,7 @@ fn test_cancel_match_refunds_only_player1_when_only_player1_deposited() {
     assert_eq!(client.get_match(&id).state, MatchState::Cancelled);
 }
 
-// ── Re-entrancy Analysis ─────────────────────────────────────────────────────
+// â”€â”€ Re-entrancy Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //
 // Soroban's execution model prevents classic re-entrancy: the runtime does not
 // allow a contract to be re-entered while it is already executing (the host
@@ -2598,7 +2599,7 @@ fn test_cancel_match_refunds_only_player1_when_only_player1_deposited() {
 //   2. In `submit_result`: all validation (caller auth, game_id, state check)
 //      occurs BEFORE the payout transfers. The state is set to Completed AFTER
 //      the transfers complete. If a transfer failed (e.g., insufficient balance),
-//      the whole transaction reverts — no inconsistent state is persisted.
+//      the whole transaction reverts â€” no inconsistent state is persisted.
 //
 // The tests below verify the checks-effects-interactions pattern by asserting
 // that state changes follow external calls in the correct order.
@@ -2613,7 +2614,7 @@ fn test_reentrancy_deposit_checks_effects_interactions() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "reentrancy_deposit"),
         &Platform::Lichess,
     );
@@ -2623,7 +2624,7 @@ fn test_reentrancy_deposit_checks_effects_interactions() {
     assert!(!m.player1_deposited);
     assert_eq!(token_client.balance(&player1), 1000);
 
-    // Deposit succeeds — checks (state validation) happen before the external
+    // Deposit succeeds â€” checks (state validation) happen before the external
     // token transfer, and effects (state update) happen after.
     client.deposit(&id, &player1);
 
@@ -2644,7 +2645,7 @@ fn test_reentrancy_submit_result_checks_effects_interactions() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "reentrancy_submit"),
         &Platform::Lichess,
     );
@@ -2698,12 +2699,12 @@ fn test_deposit_insufficient_allowance() {
         &player1,
         &player2,
         &100,
-        &token_addr,
+        &Some(token_addr),
         &String::from_str(&env, "allowance_zero"),
         &Platform::Lichess,
     );
 
-    // No approval was set — allowance is 0
+    // No approval was set â€” allowance is 0
     assert_eq!(
         client.try_deposit(&id, &player1),
         Err(Ok(Error::InsufficientAllowance))
@@ -2726,7 +2727,7 @@ fn test_deposit_succeeds_with_exact_allowance() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "exact_allowance"),
         &Platform::Lichess,
     );
@@ -2736,7 +2737,7 @@ fn test_deposit_succeeds_with_exact_allowance() {
     assert_eq!(client.get_escrow_balance(&id), 100);
 }
 
-// Issue #1102: emergency_drain — success, unpaused guard, non-admin guard
+// Issue #1102: emergency_drain â€” success, unpaused guard, non-admin guard
 // The `to` parameter has been removed from emergency_drain; the destination is
 // always the `safe_address` registered at initialize time.
 
@@ -2751,7 +2752,7 @@ fn test_emergency_drain_succeeds_when_paused() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "drain_test"),
         &Platform::Lichess,
     );
@@ -2763,7 +2764,7 @@ fn test_emergency_drain_succeeds_when_paused() {
 
     client.pause();
 
-    // emergency_drain no longer accepts a destination — it always drains to safe_address
+    // emergency_drain no longer accepts a destination â€” it always drains to safe_address
     client.emergency_drain(&admin);
 
     // Capture events BEFORE any further contract calls that might clear them
@@ -2817,13 +2818,13 @@ fn test_create_match_valid_platforms_accepted() {
     let client = EscrowContractClient::new(&env, &contract_id);
 
     let id1 = client.create_match(
-        &player1, &player2, &100, &token,
+        &player1, &player2, &100, &Some(token),
         &String::from_str(&env, "lichess-game-1"), &Platform::Lichess,
     );
     assert_eq!(client.get_match(&id1).platform, Platform::Lichess);
 
     let id2 = client.create_match(
-        &player1, &player2, &100, &token,
+        &player1, &player2, &100, &Some(token),
         &String::from_str(&env, "chessdotcom-game-1"), &Platform::ChessDotCom,
     );
     assert_eq!(client.get_match(&id2).platform, Platform::ChessDotCom);
@@ -2854,7 +2855,7 @@ fn test_create_match_stake_too_high_fails() {
             &player1,
             &player2,
             &(crate::MAX_STAKE + 1),
-            &token,
+            &Some(token),
             &String::from_str(&env, "too_high"),
             &Platform::Lichess,
         ),
@@ -2870,7 +2871,7 @@ fn test_create_match_max_stake() {
         &player1,
         &player2,
         &crate::MAX_STAKE,
-        &token,
+        &Some(token),
         &String::from_str(&env, "max_stake"),
         &Platform::Lichess,
     );
@@ -2887,7 +2888,7 @@ fn test_finalize_result_dispute_window_boundary() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "boundary_test"),
         &Platform::Lichess,
     );
@@ -2921,7 +2922,7 @@ fn test_create_match_stake_below_min_fails() {
             &player1,
             &player2,
             &0,
-            &token,
+            &Some(token),
             &String::from_str(&env, "below_min"),
             &Platform::Lichess,
         ),
@@ -2947,9 +2948,9 @@ fn test_instance_ttl_extended_on_initialize() {
     assert!(instance_ttl >= crate::INSTANCE_LIFETIME_THRESHOLD);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Pagination Tests
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 #[test]
 fn test_list_matches_empty_contract() {
@@ -2972,7 +2973,7 @@ fn test_list_matches_basic() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         );
@@ -2999,7 +3000,7 @@ fn test_list_matches_with_limit() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         );
@@ -3030,7 +3031,7 @@ fn test_list_matches_offset() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         );
@@ -3069,7 +3070,7 @@ fn test_list_matches_after_basic() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         );
@@ -3094,7 +3095,7 @@ fn test_list_matches_after_with_cursor() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         );
@@ -3130,7 +3131,7 @@ fn test_list_matches_after_unambiguous_eof() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         );
@@ -3165,7 +3166,7 @@ fn test_list_matches_after_limit() {
             &player1,
             &player2,
             &100,
-            &token,
+            &Some(token),
             &game_id,
             &Platform::Lichess,
         );
@@ -3193,7 +3194,7 @@ fn test_get_game_id_owner_returns_match_id_and_none_for_unknown() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &game_a,
         &Platform::Lichess,
     );
@@ -3201,7 +3202,7 @@ fn test_get_game_id_owner_returns_match_id_and_none_for_unknown() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &game_b,
         &Platform::Lichess,
     );
@@ -3226,9 +3227,9 @@ fn test_get_game_id_owner_returns_match_id_and_none_for_unknown() {
     );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Issue #1122 — Property-based tests for state machine transition invariants
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Issue #1122 â€” Property-based tests for state machine transition invariants
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /// Issue #1036: A third party (neither player1 nor player2) must be rejected
 /// with Error::Unauthorized when they call claim_timeout, even after the
@@ -3242,7 +3243,7 @@ fn test_claim_timeout_third_party_unauthorized() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "timeout_3p"),
         &Platform::Lichess,
     );
@@ -3275,7 +3276,7 @@ fn test_claim_timeout_player1_succeeds_after_timeout() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "timeout_p1"),
         &Platform::Lichess,
     );
@@ -3305,14 +3306,14 @@ fn test_claim_timeout_too_early_fails() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "timeout_early"),
         &Platform::Lichess,
     );
     client.deposit(&id, &player1);
     client.deposit(&id, &player2);
 
-    // Do NOT advance the ledger — timeout period has not elapsed
+    // Do NOT advance the ledger â€” timeout period has not elapsed
     assert_eq!(
         client.try_claim_timeout(&id, &player1),
         Err(Ok(Error::MatchTimedOut)),
@@ -3320,13 +3321,13 @@ fn test_claim_timeout_too_early_fails() {
     );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Issue #1036 ── (end)
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Issue #1036 â”€â”€ (end)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Issue #1035 — transfer_admin extend_ttl test
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Issue #1035 â€” transfer_admin extend_ttl test
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /// Issue #1035: transfer_admin must extend the instance TTL after updating the
 /// admin so the new admin's first read of instance storage succeeds even when
@@ -3353,9 +3354,9 @@ fn test_transfer_admin_extends_instance_ttl() {
     );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Issue #1034 — emergency_drain drain_noop event test
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Issue #1034 â€” emergency_drain drain_noop event test
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /// Issue #1034 / #69: when emergency_drain is called on a zero-balance contract,
 /// it must emit a drn_noop event, return Ok(()), and must NOT attempt a transfer.
@@ -3385,7 +3386,7 @@ fn test_emergency_drain_zero_balance_emits_drain_noop() {
     // Pause the contract (required by emergency_drain)
     client.pause();
 
-    // Call emergency_drain on an empty contract — must succeed (no error)
+    // Call emergency_drain on an empty contract â€” must succeed (no error)
     assert!(
         client.try_emergency_drain(&admin).is_ok(),
         "emergency_drain on zero balance must return Ok(())"
@@ -3415,9 +3416,9 @@ fn test_emergency_drain_zero_balance_emits_drain_noop() {
     assert_eq!(amount, 0, "drn_noop event amount must be 0");
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Issue #1033 — pending_result_ledger Option<u32> tests
-// ═══════════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Issue #1033 â€” pending_result_ledger Option<u32> tests
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /// Issue #1033: pending_result_ledger must be None before any oracle result
 /// is submitted (not a 0 sentinel).
@@ -3430,7 +3431,7 @@ fn test_pending_result_ledger_none_before_submit() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "prl_none"),
         &Platform::Lichess,
     );
@@ -3454,7 +3455,7 @@ fn test_pending_result_ledger_some_after_submit() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "prl_some"),
         &Platform::Lichess,
     );
@@ -3505,7 +3506,7 @@ mod proptest_state_machine {
         Address, Env, String,
     };
 
-    // ── helpers ─────────────────────────────────────────────────────────────
+    // â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Build a minimal environment with the escrow contract initialised.
     fn prop_setup() -> (Env, Address, Address, Address, Address, Address, Address) {
@@ -3536,10 +3537,10 @@ mod proptest_state_machine {
         (env, contract_id, oracle, player1, player2, token_addr, admin)
     }
 
-    // ── invariant 1: Completed is terminal ──────────────────────────────────
+    // â”€â”€ invariant 1: Completed is terminal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// After a match reaches the `Completed` state any subsequent call to
-    /// `deposit`, `cancel_match`, or `submit_result` must return an error —
+    /// `deposit`, `cancel_match`, or `submit_result` must return an error â€”
     /// never silently succeed.
     ///
     /// We parametrise over which player wins so proptest can cover all three
@@ -3559,7 +3560,7 @@ mod proptest_state_machine {
                 &player1,
                 &player2,
                 &100,
-                &token,
+                &Some(token),
                 &String::from_str(&env, "prop-completed"),
                 &Platform::Lichess,
             );
@@ -3607,7 +3608,7 @@ mod proptest_state_machine {
         }
     }
 
-    // ── invariant 2: Cancelled is terminal ──────────────────────────────────
+    // â”€â”€ invariant 2: Cancelled is terminal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// After a match reaches the `Cancelled` state any subsequent call to
     /// `deposit`, `cancel_match`, or `submit_result` must return an error.
@@ -3623,7 +3624,7 @@ mod proptest_state_machine {
                 &player1,
                 &player2,
                 &100,
-                &token,
+                &Some(token),
                 &String::from_str(&env, "prop-cancelled"),
                 &Platform::Lichess,
             );
@@ -3663,10 +3664,10 @@ mod proptest_state_machine {
         }
     }
 
-    // ── invariant 3: Active → unilateral cancel rejected, mutual cancel allowed ─────
+    // â”€â”€ invariant 3: Active â†’ unilateral cancel rejected, mutual cancel allowed â”€â”€â”€â”€â”€
 
     /// Once a match is `Active` (both players deposited), a *unilateral* `cancel_match`
-    /// (only one player's auth) must always be rejected — the contract requires both
+    /// (only one player's auth) must always be rejected â€” the contract requires both
     /// players to authorize. A mutual cancel (both auths present) is allowed and
     /// should return `Ok`.
     proptest! {
@@ -3683,7 +3684,7 @@ mod proptest_state_machine {
                 &player1,
                 &player2,
                 &100,
-                &token,
+                &Some(token),
                 &String::from_str(&env, "prop-active-cancel"),
                 &Platform::Lichess,
             );
@@ -3692,7 +3693,7 @@ mod proptest_state_machine {
 
             prop_assert_eq!(client.get_match(&id).state, MatchState::Active);
 
-            // Provide only one player's auth — must be rejected
+            // Provide only one player's auth â€” must be rejected
             let (caller, fn_caller) = if cancel_caller_is_p1 {
                 (&player1, player1.clone())
             } else {
@@ -3716,7 +3717,7 @@ mod proptest_state_machine {
         }
     }
 
-    // ── invariant 4: submit_result only valid from Active ────────────────────
+    // â”€â”€ invariant 4: submit_result only valid from Active â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// `submit_result` must return `InvalidState` when called on a match that
     /// is in `Pending` or `Cancelled` state (covers non-Active starting states
@@ -3745,7 +3746,7 @@ mod proptest_state_machine {
                 &player1,
                 &player2,
                 &100,
-                &token,
+                &Some(token),
                 &game_id,
                 &Platform::Lichess,
             );
@@ -3756,7 +3757,7 @@ mod proptest_state_machine {
                 _ => {}
             }
 
-            // Match is Pending (not Active) — submit_result must be rejected
+            // Match is Pending (not Active) â€” submit_result must be rejected
             let result = client.try_submit_result(
                 &id,
                 &game_id,
@@ -3776,7 +3777,7 @@ mod proptest_state_machine {
         }
     }
 
-    // ── invariant 5: no operation accepted after terminal state ───────────────
+    // â”€â”€ invariant 5: no operation accepted after terminal state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Comprehensive sweep: for every reachable terminal state, assert that
     /// ALL mutating operations are rejected.  This catches any future addition
@@ -3799,7 +3800,7 @@ mod proptest_state_machine {
             let game_id = String::from_str(&env, game_str);
 
             let id = client.create_match(
-                &player1, &player2, &100, &token, &game_id, &Platform::Lichess,
+                &player1, &player2, &100, &Some(token), &game_id, &Platform::Lichess,
             );
 
             if reach_completed {
@@ -3826,7 +3827,7 @@ mod proptest_state_machine {
 }
 
 // ============================================================================
-// #1031 — get_token view function
+// #1031 â€” get_token view function
 // ============================================================================
 
 #[test]
@@ -3838,7 +3839,7 @@ fn test_get_token_returns_initialized_token() {
 }
 
 // ============================================================================
-// #1032 — activated_ledger Option<u32> semantics
+// #1032 â€” activated_ledger Option<u32> semantics
 // ============================================================================
 
 #[test]
@@ -3850,7 +3851,7 @@ fn test_activated_ledger_none_before_both_deposits() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "game_opt_test"),
         &Platform::Lichess,
     );
@@ -3880,7 +3881,7 @@ fn test_activated_ledger_some_after_both_deposits() {
         &player1,
         &player2,
         &100,
-        &token,
+        &Some(token),
         &String::from_str(&env, "game_opt_activated"),
         &Platform::Lichess,
     );
@@ -3957,7 +3958,7 @@ mod fuzz {
 
         // Call create_match with arbitrary stake_amount
         let result = client.try_create_match(
-            &player1, &player2, &stake, &token, &game_id, &Platform::Lichess,
+            &player1, &player2, &stake, &Some(token), &game_id, &Platform::Lichess,
         );
 
         // Result must be either Ok or a known error code
@@ -3989,7 +3990,7 @@ mod fuzz {
                 );
             }
             Err(Err(e)) => {
-                // Panic or SDK error — should NOT happen
+                // Panic or SDK error â€” should NOT happen
                 panic!("Unexpected panic or SDK error: {:?}", e);
             }
         }
@@ -4008,7 +4009,7 @@ mod fuzz {
             .unwrap_or_else(|_| String::from_str(&env, "invalid_utf8"));
 
         let result = client.try_create_match(
-            &player1, &player2, &100, &token, &game_id_str, &Platform::Lichess,
+            &player1, &player2, &100, &Some(token), &game_id_str, &Platform::Lichess,
         );
 
         // Same validation as stake_amount test
@@ -4060,7 +4061,7 @@ mod fuzz {
             Ok(_) => {
                 // If it succeeded, the stake must be valid
                 // (other validations passed, but same player should have failed)
-                // This is actually unexpected — should be InvalidPlayers error
+                // This is actually unexpected â€” should be InvalidPlayers error
             }
             Err(Ok(err)) => {
                 // Expected to be InvalidPlayers when stake is valid
@@ -4102,7 +4103,7 @@ mod fuzz {
             let game_id = String::from_str(&env, &format!("game_{}", i));
 
             let result = client.try_create_match(
-                &player1, &player2, &stake, &token, &game_id, &Platform::Lichess,
+                &player1, &player2, &stake, &Some(token), &game_id, &Platform::Lichess,
             );
 
             if let Ok(match_id) = result {
@@ -4133,13 +4134,13 @@ mod fuzz {
 
         // First call
         let result1 = client.try_create_match(
-            &player1, &player2, &stake, &token, &game_id, &Platform::Lichess,
+            &player1, &player2, &stake, &Some(token), &game_id, &Platform::Lichess,
         );
 
         if result1.is_ok() {
             // Second call with same game_id should fail
             let result2 = client.try_create_match(
-                &player1, &player2, &stake, &token, &game_id, &Platform::Lichess,
+                &player1, &player2, &stake, &Some(token), &game_id, &Platform::Lichess,
             );
 
             assert!(
@@ -4150,3 +4151,305 @@ mod fuzz {
         }
     }
 }
+
+// ===========================================================================
+// Multi-token escrow — issue #121 / #1800
+//
+// Covers the allowlist lifecycle (add / remove / query, and who may call it)
+// and the three token scenarios the acceptance criteria call for: XLM-only,
+// USDC-only, and a contract with both allowlisted.
+// ===========================================================================
+
+/// Register a second SEP-41 token and mint/approve it for both players.
+///
+/// Returns the token address. Approvals matter because `deposit` refuses a
+/// player who has not approved the escrow for the token the match names — a
+/// USDC match must be approved in USDC, not in XLM.
+fn setup_second_token(
+    env: &Env,
+    contract_id: &Address,
+    player1: &Address,
+    player2: &Address,
+) -> Address {
+    let issuer = Address::generate(env);
+    let token_id = env.register_stellar_asset_contract_v2(issuer);
+    let token_addr = token_id.address();
+
+    let asset_client = StellarAssetClient::new(env, &token_addr);
+    asset_client.mint(player1, &1000);
+    asset_client.mint(player2, &1000);
+    // Top up the reserve in the second token too, so a payout in it can satisfy
+    // `ensure_reserve_for_payout`.
+    asset_client.mint(contract_id, &ESCROW_RESERVE_BUFFER_STROOPS);
+
+    let expiration = env.ledger().sequence() + 1000000;
+    let token_client = TokenClient::new(env, &token_addr);
+    token_client.approve(player1, contract_id, &1000, &expiration);
+    token_client.approve(player2, contract_id, &1000, &expiration);
+
+    token_addr
+}
+
+#[test]
+fn test_default_token_is_allowlisted_after_initialize() {
+    let (env, _contract_id, _oracle, _p1, _p2, token, _admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &_contract_id);
+    // `initialize` seeds the allowlist, so an untouched contract still accepts
+    // the token it was configured with.
+    assert!(client.is_token_allowlisted(&token));
+}
+
+#[test]
+fn test_unlisted_token_is_not_allowlisted() {
+    let (env, contract_id, _oracle, _p1, _p2, _token, _admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let other = setup_second_token(&env, &contract_id, &_p1, &_p2);
+    assert!(!client.is_token_allowlisted(&other));
+}
+
+#[test]
+fn test_create_match_rejects_unlisted_token() {
+    let (env, contract_id, _oracle, player1, player2, _token, _admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let other = setup_second_token(&env, &contract_id, &player1, &player2);
+
+    // The allowlist is what stops a caller from pointing the escrow at an
+    // arbitrary SEP-41 contract.
+    assert_eq!(
+        client.try_create_match(
+            &player1,
+            &player2,
+            &100,
+            &Some(other),
+            &String::from_str(&env, "unlisted"),
+            &Platform::Lichess,
+        ),
+        Err(Ok(Error::TokenNotAllowlisted))
+    );
+}
+
+#[test]
+fn test_create_match_with_none_uses_default_token() {
+    let (env, contract_id, _oracle, player1, player2, token, _admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+
+    let id = client.create_match(
+        &player1,
+        &player2,
+        &100,
+        &None,
+        &String::from_str(&env, "default-token"),
+        &Platform::Lichess,
+    );
+
+    // `None` means "whatever this contract was initialized with" — the stored
+    // match must show the default token, not a null.
+    assert_eq!(client.get_match(&id).token, token);
+}
+
+#[test]
+fn test_add_token_allows_match_in_that_token() {
+    let (env, contract_id, _oracle, player1, player2, _token, admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let usdc = setup_second_token(&env, &contract_id, &player1, &player2);
+
+    client.add_token(&usdc, &admin);
+    assert!(client.is_token_allowlisted(&usdc));
+
+    let id = client.create_match(
+        &player1,
+        &player2,
+        &100,
+        &Some(usdc.clone()),
+        &String::from_str(&env, "usdc-match"),
+        &Platform::Lichess,
+    );
+    // The chosen token is recorded on the match and is what it settles in.
+    assert_eq!(client.get_match(&id).token, usdc);
+}
+
+#[test]
+fn test_deposit_and_payout_use_the_match_token() {
+    let (env, contract_id, oracle, player1, player2, _token, admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let usdc = setup_second_token(&env, &contract_id, &player1, &player2);
+    client.add_token(&usdc, &admin);
+
+    let id = client.create_match(
+        &player1,
+        &player2,
+        &100,
+        &Some(usdc.clone()),
+        &String::from_str(&env, "mixed-settle"),
+        &Platform::Lichess,
+    );
+
+    let usdc_client = TokenClient::new(&env, &usdc);
+    let before = usdc_client.balance(&player1);
+
+    client.deposit(&id, &player1);
+    client.deposit(&id, &player2);
+    // Funds must have moved in USDC, not in the default token.
+    assert_eq!(
+        usdc_client.balance(&contract_id),
+        ESCROW_RESERVE_BUFFER_STROOPS + 200
+    );
+
+    client.submit_result(&id, &String::from_str(&env, "mixed-settle"), &Winner::Player1, &oracle);
+    env.ledger().set_sequence_number(env.ledger().sequence() + 17_281);
+    client.finalize_result(&id, &player1);
+
+    // Winner received the pot in USDC.
+    assert_eq!(usdc_client.balance(&player1), before + 200);
+}
+
+#[test]
+fn test_xlm_only_and_usdc_only_matches_coexist() {
+    // The "mixed-token" scenario: one contract, matches in both currencies,
+    // each settling in the token it was created with.
+    let (env, contract_id, oracle, player1, player2, xlm, admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let usdc = setup_second_token(&env, &contract_id, &player1, &player2);
+    client.add_token(&usdc, &admin);
+
+    let xlm_id = client.create_match(
+        &player1,
+        &player2,
+        &100,
+        &Some(xlm.clone()),
+        &String::from_str(&env, "xlm-only"),
+        &Platform::Lichess,
+    );
+    let usdc_id = client.create_match(
+        &player1,
+        &player2,
+        &100,
+        &Some(usdc.clone()),
+        &String::from_str(&env, "usdc-only"),
+        &Platform::Lichess,
+    );
+
+    assert_eq!(client.get_match(&xlm_id).token, xlm);
+    assert_eq!(client.get_match(&usdc_id).token, usdc);
+    assert_ne!(xlm_id, usdc_id);
+    let _ = oracle;
+}
+
+#[test]
+fn test_add_token_requires_admin() {
+    let (env, contract_id, _oracle, player1, player2, _token, _admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let other = setup_second_token(&env, &contract_id, &player1, &player2);
+
+    assert_eq!(
+        client.try_add_token(&other, &player1),
+        Err(Ok(Error::Unauthorized))
+    );
+    assert!(!client.is_token_allowlisted(&other));
+}
+
+#[test]
+fn test_remove_token_requires_admin() {
+    let (env, contract_id, _oracle, player1, player2, _token, admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let usdc = setup_second_token(&env, &contract_id, &player1, &player2);
+    client.add_token(&usdc, &admin);
+
+    assert_eq!(
+        client.try_remove_token(&usdc, &player2),
+        Err(Ok(Error::Unauthorized))
+    );
+    assert!(client.is_token_allowlisted(&usdc));
+}
+
+#[test]
+fn test_remove_token_blocks_new_matches_but_keeps_existing_ones() {
+    let (env, contract_id, oracle, player1, player2, _token, admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let usdc = setup_second_token(&env, &contract_id, &player1, &player2);
+    client.add_token(&usdc, &admin);
+
+    // A match that already exists when the token is delisted.
+    let id = client.create_match(
+        &player1,
+        &player2,
+        &100,
+        &Some(usdc.clone()),
+        &String::from_str(&env, "in-flight"),
+        &Platform::Lichess,
+    );
+    client.deposit(&id, &player1);
+    client.deposit(&id, &player2);
+
+    client.remove_token(&usdc, &admin);
+    assert!(!client.is_token_allowlisted(&usdc));
+
+    // New matches are refused...
+    assert_eq!(
+        client.try_create_match(
+            &player1,
+            &player2,
+            &100,
+            &Some(usdc.clone()),
+            &String::from_str(&env, "after-removal"),
+            &Platform::Lichess,
+        ),
+        Err(Ok(Error::TokenNotAllowlisted))
+    );
+
+    // ...but the in-flight match still settles, so no player is stranded.
+    client.submit_result(&id, &String::from_str(&env, "in-flight"), &Winner::Player1, &oracle);
+    env.ledger().set_sequence_number(env.ledger().sequence() + 17_281);
+    client.finalize_result(&id, &player1);
+    assert_eq!(client.get_match(&id).state, MatchState::Completed);
+}
+
+#[test]
+fn test_cannot_remove_default_token() {
+    let (env, contract_id, _oracle, _p1, _p2, token, admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+
+    // Otherwise the contract could be left with no acceptable token at all,
+    // and no way to recover short of an upgrade.
+    assert_eq!(
+        client.try_remove_token(&token, &admin),
+        Err(Ok(Error::CannotRemoveDefault))
+    );
+    assert!(client.is_token_allowlisted(&token));
+}
+
+#[test]
+fn test_add_token_twice_is_rejected() {
+    let (env, contract_id, _oracle, player1, player2, _token, admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let usdc = setup_second_token(&env, &contract_id, &player1, &player2);
+
+    client.add_token(&usdc, &admin);
+    // A loud failure beats a silent no-op for a deployment script.
+    assert_eq!(
+        client.try_add_token(&usdc, &admin),
+        Err(Ok(Error::TokenAlreadyListed))
+    );
+}
+
+#[test]
+fn test_remove_unlisted_token_is_rejected() {
+    let (env, contract_id, _oracle, player1, player2, _token, admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    let usdc = setup_second_token(&env, &contract_id, &player1, &player2);
+
+    assert_eq!(
+        client.try_remove_token(&usdc, &admin),
+        Err(Ok(Error::TokenNotListed))
+    );
+}
+
+#[test]
+fn test_get_token_still_returns_default() {
+    let (env, contract_id, _oracle, _p1, _p2, token, _admin, _safe) = setup();
+    let client = EscrowContractClient::new(&env, &contract_id);
+    // The multi-token change must not alter what `get_token` reports: it is the
+    // default, and existing callers depend on that meaning.
+    assert_eq!(client.get_token(), token);
+}
+

@@ -38,6 +38,10 @@ use soroban_sdk::contracterror;
 /// | 25   | StakeTooHigh          | stake_amount exceeds the maximum allowed stake |
 /// | 26   | InsufficientReserve   | contract balance too low to cover payout + Stellar minimum reserve |
 /// | 27   | InvalidAddress        | a player address is invalid (zero address / burn address) |
+/// | 28   | TokenNotAllowlisted   | the token is not on the admin-managed allowlist |
+/// | 29   | TokenAlreadyListed    | `add_token` called for a token that is already allowlisted |
+/// | 30   | TokenNotListed        | `remove_token` called for a token that is not allowlisted |
+/// | 31   | CannotRemoveDefault   | `remove_token` cannot remove the contract's default token |
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Error {
@@ -135,4 +139,30 @@ pub enum Error {
     /// Players must be valid, controlled addresses. Matches created with zero addresses
     /// would result in payout funds being sent to uncontrolled addresses.
     InvalidAddress = 27,
+
+    /// [E028] The token is not on the admin-managed allowlist.
+    ///
+    /// Returned by `create_match` when the requested token has never been
+    /// allowlisted, or was allowlisted and later removed. This is the check
+    /// that stops a caller from escrowing an arbitrary SEP-41 contract.
+    TokenNotAllowlisted = 28,
+
+    /// [E029] `add_token` was called for a token that is already allowlisted.
+    ///
+    /// A distinct error rather than a silent no-op, so a misconfigured
+    /// deployment script fails loudly instead of appearing to have added the
+    /// same token twice.
+    TokenAlreadyListed = 29,
+
+    /// [E030] `remove_token` was called for a token that is not allowlisted.
+    TokenNotListed = 30,
+
+    /// [E031] `remove_token` was called for the contract's default token.
+    ///
+    /// The default token set at `initialize` cannot be removed. Otherwise the
+    /// contract could be left with no acceptable token at all, and every
+    /// subsequent `create_match` — including one that omits the token argument
+    /// and so falls back to the default — would fail with no way to recover
+    /// short of a contract upgrade.
+    CannotRemoveDefault = 31,
 }
