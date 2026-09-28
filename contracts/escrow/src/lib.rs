@@ -54,70 +54,15 @@
 
 #![no_std]
 
+mod constants;
 mod errors;
 mod types;
+
+pub use constants::*;
 
 use errors::Error;
 use soroban_sdk::{contract, contractimpl, symbol_short, token, vec, Address, Env, String, Symbol, TryFromVal, Vec};
 use types::{DataKey, Match, MatchState, OptionalWinner, Platform, Winner};
-
-/// ~30 days at 5s/ledger. Used as both the TTL threshold and the extend-to value.
-const MATCH_TTL_LEDGERS: u32 = 518_400;
-
-/// Minimum stake amount in the smallest token unit (1 stroop).
-/// Prevents economically meaningless zero-stake matches.
-const MIN_STAKE: i128 = 1;
-
-/// Maximum stake amount in the smallest token unit.
-/// Prevents a single match from locking unbounded funds in escrow,
-/// concentrating risk, and amplifying the impact of any exploit.
-const MAX_STAKE: i128 = 10_000_000_000_000;
-
-/// Instance-storage TTL threshold (~30 days at 5s/ledger).
-/// Instance entries (oracle, admin, token, paused, match_count) are
-/// extended to this many ledgers from the current ledger on every write.
-/// Without this, metadata entries would expire and the contract would
-/// become non-functional with storage-not-found errors.
-const INSTANCE_LIFETIME_THRESHOLD: u32 = 518_400;
-
-/// The number of ledgers to extend instance-storage entries to.
-/// Uses the same ~30-day window as persistent match storage.
-const INSTANCE_BUMP_AMOUNT: u32 = 518_400;
-
-/// Maximum allowed byte length for a game_id string.
-const MAX_GAME_ID_LEN: u32 = 64;
-
-/// Dispute window: ~24 hours at 5s/ledger (17 280 ledgers).
-/// After an oracle result is submitted, the admin has this many ledgers to call
-/// `override_result` before the result is finalised and payout is executed.
-const DISPUTE_WINDOW_LEDGERS: u32 = 17_280;
-
-/// Match timeout: ~7 days at 5s/ledger (120 960 ledgers).
-/// If a match has been `Active` for longer than this many ledgers without an oracle
-/// result, either player may call `claim_timeout` to reclaim their stake.
-const TIMEOUT_LEDGERS: u32 = 120_960;
-
-/// Reserve buffer (in stroops) that the contract must always retain **after** a
-/// payout, in order to satisfy Stellar's minimum-account-balance rule and leave
-/// a small operational safety margin.
-///
-/// Every Stellar account (including the address that backs a Soroban contract)
-/// must hold at least 2 base reserves = **1 XLM** just to exist on the ledger.
-/// If an escrow payout would reduce the contract balance below that threshold,
-/// the underlying Stellar `PAYMENT` / `transfer` op aborts and the match state
-/// machine is left inconsistent (state not advanced, funds not sent).
-///
-/// We therefore require that after any payout the contract still holds at least
-/// `ESCROW_RESERVE_BUFFER_STROOPS` of the configured token. When the configured
-/// token is the native XLM token this value is the literal stroop reserve kept
-/// in the account. For non-native tokens (e.g. USDC) the same constant still
-/// serves as a floor — the real XLM minimum is still provided by a separate
-/// admin-funded 1.5 XLM native top-up (see `docs/deployment.md`), and the
-/// identical on-chain check prevents a 100%-held-USDC balance from causing a
-/// confusing generic `TransferFailed`.
-///
-/// `15 000 000 stroops = 1.5 XLM` (1 XLM minimum base reserve + 0.5 XLM slack).
-const ESCROW_RESERVE_BUFFER_STROOPS: i128 = 15_000_000;
 
 fn is_zero_address(env: &Env, addr: &Address) -> bool {
     // The all-zeros Stellar account key encodes to this strkey.
@@ -211,6 +156,19 @@ impl EscrowContract {
             }
         }
         true
+    }
+
+    /// Extend the lifetime of every instance-storage entry held by this contract.
+    ///
+    /// Instance storage (oracle, admin, token, paused, match_count) shares a single
+    /// TTL, so it is bumped as a unit after every mutating call. Without this the
+    /// instance entries would expire while a long-running tournament of matches was
+    /// still in progress and the contract would start failing with storage-not-found
+    /// errors.
+    fn bump_instance_ttl(env: &Env) {
+        env.storage()
+            .instance()
+            .extend_ttl(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
     }
 
     /// Pre-flight check that the contract retains at least
@@ -1370,126 +1328,5 @@ mod tests;
 #[cfg(test)]
 mod tests_e2e;
 
-    /// Read the admin address. Shared by every admin-only entry point so the
-    /// "is this caller the admin" rule is written down exactly once.
-    fn require_admin(env: &Env, caller: &Address) -> Result<Address, Error> {
-        let admin: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Admin)
-            .ok_or(Error::Unauthorized)?;
-        if *caller != admin {
-            return Err(Error::Unauthorized);
-        }
-        caller.require_auth();
-        Ok(admin)
-    }
-
-    /// Return whether `token` is currently accepted by this contract.
-    ///
-    /// A read-only view so a frontend can grey out a currency selector without
-    /// having to attempt a doomed `create_match` first. The default token is
-    /// always allowlisted, so this never returns `false` for it.
-    pub fn is_token_allowlisted(env: Env, token: Address) -> bool {
-        env.storage()
-            .persistent()
-            .has(&DataKey::TokenAllowlisted(token))
-    }
-
-    /// Add a SEP-41 token to the allowlist — admin only.
-    ///
-    /// After this call, `create_match` may name `token` explicitly and matches
-    /// created in it will escrow, settle and pay out in `token`.
-    ///
-    /// Adding a token is deliberately **not** a statement that the token is
-    /// safe, liquid, or backed by anything. It is only a statement that the
-    /// admin accepts it as a stake currency. The allowlist exists to stop an
-    /// arbitrary caller from pointing the escrow at a contract of their
-    /// choosing; the judgement about which currencies to list stays with the
-    /// admin, and every change is recorded on-chain via the emitted event.
-    ///
-    /// # Errors
-    ///
-    /// * [`Error::Unauthorized`] — caller is not the admin.
-    /// * [`Error::TokenAlreadyListed`] — the token is already allowlisted.
-    pub fn add_token(env: Env, token: Address, caller: Address) -> Result<(), Error> {
-        let admin = Self::require_admin(&env, &caller)?;
-
-        if env
-            .storage()
-            .persistent()
-            .has(&DataKey::TokenAllowlisted(token.clone()))
-        {
-            return Err(Error::TokenAlreadyListed);
-        }
-
-        // Probe the token so a typo or a non-token address is rejected here,
-        // at configuration time, rather than later when a player picks that
-        // currency and their deposit mysteriously fails.
-        let token_client = token::Client::new(&env, &token);
-        let _ = token_client.decimals();
-
-        env.storage()
-            .persistent()
-            .set(&DataKey::TokenAllowlisted(token.clone()), &true);
-        env.storage().persistent().extend_ttl(
-            &DataKey::TokenAllowlisted(token.clone()),
-            MATCH_TTL_LEDGERS,
-            MATCH_TTL_LEDGERS,
-        );
-        Self::bump_instance_ttl(&env);
-
-        env.events().publish(
-            (Symbol::new(&env, "admin"), symbol_short!("token_add")),
-            (token, admin),
-        );
-        Ok(())
-    }
-
-    /// Remove a token from the allowlist — admin only.
-    ///
-    /// This stops **new** matches from being created in `token`. It does not
-    /// touch matches that already exist: their escrows remain in `token` and
-    /// still settle and pay out there, because a player who funded a match
-    /// must be able to finish it. Removing a token is how an admin delists a
-    /// currency that turned out to be broken without stranding funds.
-    ///
-    /// The contract's default token cannot be removed — see
-    /// [`Error::CannotRemoveDefault`].
-    ///
-    /// # Errors
-    ///
-    /// * [`Error::Unauthorized`] — caller is not the admin.
-    /// * [`Error::TokenNotListed`] — the token was not allowlisted.
-    /// * [`Error::CannotRemoveDefault`] — the token is the contract default.
-    pub fn remove_token(env: Env, token: Address, caller: Address) -> Result<(), Error> {
-        let admin = Self::require_admin(&env, &caller)?;
-
-        let default_token: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Token)
-            .ok_or(Error::Unauthorized)?;
-        if token == default_token {
-            return Err(Error::CannotRemoveDefault);
-        }
-
-        if !env
-            .storage()
-            .persistent()
-            .has(&DataKey::TokenAllowlisted(token.clone()))
-        {
-            return Err(Error::TokenNotListed);
-        }
-
-        env.storage()
-            .persistent()
-            .remove(&DataKey::TokenAllowlisted(token.clone()));
-        Self::bump_instance_ttl(&env);
-
-        env.events().publish(
-            (Symbol::new(&env, "admin"), symbol_short!("token_del")),
-            (token, admin),
-        );
-        Ok(())
-    }
+#[cfg(test)]
+mod tests_fuzz;

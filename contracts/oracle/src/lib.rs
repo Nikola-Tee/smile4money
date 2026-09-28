@@ -51,21 +51,15 @@
 
 #![no_std]
 
+mod constants;
 mod errors;
 mod types;
+
+pub use constants::*;
 
 use errors::Error;
 use soroban_sdk::{contract, contractimpl, symbol_short, token, Address, Env, String, Symbol, Vec};
 use types::{DataKey, InstanceState, MatchResult, ResultEntry};
-
-/// ~30 days at 5s/ledger.
-const MATCH_TTL_LEDGERS: u32 = 518_400;
-
-/// Maximum allowed byte length for a game_id string.
-const MAX_GAME_ID_LEN: u32 = 64;
-
-/// Maximum number of entries returned by list_results in a single call.
-const MAX_LIST_LIMIT: u32 = 100;
 
 /// Validate that every byte of `game_id` belongs to the set `[A-Za-z0-9_-]`.
 ///
@@ -507,7 +501,11 @@ mod tests {
             invoke: &MockAuthInvoke {
                 contract: &contract_id,
                 fn_name: "submit_result",
-                args: (1u64, String::from_str(&env, "game1"), MatchResult::Player1Wins)
+                args: (
+                    1u64,
+                    String::from_str(&env, "game1"),
+                    MatchResult::Player1Wins,
+                )
                     .into_val(&env),
                 sub_invokes: &[],
             },
@@ -515,11 +513,18 @@ mod tests {
 
         assert!(
             client
-                .try_submit_result(&1u64, &String::from_str(&env, "game1"), &MatchResult::Player1Wins)
+                .try_submit_result(
+                    &1u64,
+                    &String::from_str(&env, "game1"),
+                    &MatchResult::Player1Wins
+                )
                 .is_err(),
             "non-admin must not be able to submit results"
         );
-        assert!(!client.has_result(&1u64), "result must not be stored after rejected submission");
+        assert!(
+            !client.has_result(&1u64),
+            "result must not be stored after rejected submission"
+        );
     }
 
     #[test]
@@ -743,8 +748,16 @@ mod tests {
         let (ev_match_id, ev_game_id, ev_result): (u64, String, MatchResult) =
             soroban_sdk::TryFromVal::try_from_val(&env, &actual_data).unwrap();
         assert_eq!(ev_match_id, 1u64, "match_id mismatch for Player1Wins");
-        assert_eq!(ev_game_id, String::from_str(&env, "game_abc"), "game_id mismatch for Player1Wins");
-        assert_eq!(ev_result, MatchResult::Player1Wins, "result mismatch for Player1Wins");
+        assert_eq!(
+            ev_game_id,
+            String::from_str(&env, "game_abc"),
+            "game_id mismatch for Player1Wins"
+        );
+        assert_eq!(
+            ev_result,
+            MatchResult::Player1Wins,
+            "result mismatch for Player1Wins"
+        );
     }
 
     #[test]
@@ -779,8 +792,16 @@ mod tests {
         let (ev_match_id, ev_game_id, ev_result): (u64, String, MatchResult) =
             soroban_sdk::TryFromVal::try_from_val(&env, &actual_data).unwrap();
         assert_eq!(ev_match_id, 2u64, "match_id mismatch for Player2Wins");
-        assert_eq!(ev_game_id, String::from_str(&env, "game_abc"), "game_id mismatch for Player2Wins");
-        assert_eq!(ev_result, MatchResult::Player2Wins, "result mismatch for Player2Wins");
+        assert_eq!(
+            ev_game_id,
+            String::from_str(&env, "game_abc"),
+            "game_id mismatch for Player2Wins"
+        );
+        assert_eq!(
+            ev_result,
+            MatchResult::Player2Wins,
+            "result mismatch for Player2Wins"
+        );
     }
 
     #[test]
@@ -815,7 +836,11 @@ mod tests {
         let (ev_match_id, ev_game_id, ev_result): (u64, String, MatchResult) =
             soroban_sdk::TryFromVal::try_from_val(&env, &actual_data).unwrap();
         assert_eq!(ev_match_id, 3u64, "match_id mismatch for Draw");
-        assert_eq!(ev_game_id, String::from_str(&env, "game_abc"), "game_id mismatch for Draw");
+        assert_eq!(
+            ev_game_id,
+            String::from_str(&env, "game_abc"),
+            "game_id mismatch for Draw"
+        );
         assert_eq!(ev_result, MatchResult::Draw, "result mismatch for Draw");
     }
 
